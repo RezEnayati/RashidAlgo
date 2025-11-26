@@ -1,1 +1,1 @@
-# AlgoViz
+# RashidAlgo
