@@ -134,32 +134,6 @@ export default function Toolbox({
         </div>
       </div>
 
-      {/* Delete Node Section */}
-      <div className="p-4 border-b border-slate-700">
-        <h3 className="text-sm font-medium text-slate-300 mb-3">Delete Node</h3>
-        <div className="flex gap-2">
-          <select
-            value={nodeToDelete}
-            onChange={(e) => setNodeToDelete(e.target.value)}
-            className={selectClass}
-          >
-            <option value="">Select node...</option>
-            {nodes.map((node) => (
-              <option key={node.id} value={node.id}>
-                {node.data.label}
-              </option>
-            ))}
-          </select>
-          <button
-            onClick={handleDeleteNode}
-            disabled={!nodeToDelete}
-            className={dangerButton}
-          >
-            Delete
-          </button>
-        </div>
-      </div>
-
       {/* Add Edge Section */}
       <div className="p-4 border-b border-slate-700">
         <h3 className="text-sm font-medium text-slate-300 mb-3">Add Edge</h3>
@@ -215,29 +189,52 @@ export default function Toolbox({
         </div>
       </div>
 
-      {/* Delete Edge Section */}
+      {/* Delete Section */}
       <div className="p-4 border-b border-slate-700">
-        <h3 className="text-sm font-medium text-slate-300 mb-3">Delete Edge</h3>
-        <div className="flex gap-2">
-          <select
-            value={edgeToDelete}
-            onChange={(e) => setEdgeToDelete(e.target.value)}
-            className={selectClass}
-          >
-            <option value="">Select edge...</option>
-            {edges.map((edge) => (
-              <option key={edge.id} value={edge.id}>
-                {getEdgeLabel(edge)}
-              </option>
-            ))}
-          </select>
-          <button
-            onClick={handleDeleteEdge}
-            disabled={!edgeToDelete}
-            className={dangerButton}
-          >
-            Delete
-          </button>
+        <h3 className="text-sm font-medium text-slate-300 mb-3">Delete</h3>
+        <div className="space-y-3">
+          <div className="flex gap-2">
+            <select
+              value={nodeToDelete}
+              onChange={(e) => setNodeToDelete(e.target.value)}
+              className={selectClass}
+            >
+              <option value="">Node...</option>
+              {nodes.map((node) => (
+                <option key={node.id} value={node.id}>
+                  {node.data.label}
+                </option>
+              ))}
+            </select>
+            <button
+              onClick={handleDeleteNode}
+              disabled={!nodeToDelete}
+              className={dangerButton}
+            >
+              Delete
+            </button>
+          </div>
+          <div className="flex gap-2">
+            <select
+              value={edgeToDelete}
+              onChange={(e) => setEdgeToDelete(e.target.value)}
+              className={selectClass}
+            >
+              <option value="">Edge...</option>
+              {edges.map((edge) => (
+                <option key={edge.id} value={edge.id}>
+                  {getEdgeLabel(edge)}
+                </option>
+              ))}
+            </select>
+            <button
+              onClick={handleDeleteEdge}
+              disabled={!edgeToDelete}
+              className={dangerButton}
+            >
+              Delete
+            </button>
+          </div>
         </div>
       </div>
 

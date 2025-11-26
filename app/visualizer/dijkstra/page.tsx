@@ -139,6 +139,18 @@ export default function DijkstraVisualizerPage() {
     setIsPlaying(false);
   }, []);
 
+  // Update edge weight
+  const handleEdgeWeightChange = useCallback((edgeId: string, newWeight: number) => {
+    setEdges((prev) =>
+      prev.map((e) => (e.id === edgeId ? { ...e, weight: newWeight } : e))
+    );
+    // Reset algorithm state when edge weight changes
+    setSteps([]);
+    setCurrentStepIndex(-1);
+    setIsRunning(false);
+    setIsPlaying(false);
+  }, []);
+
   const handleRunDijkstra = useCallback(() => {
     if (!sourceNode) {
       setError('Please select a source node first.');
@@ -251,6 +263,7 @@ export default function DijkstraVisualizerPage() {
             sourceNode={sourceNode}
             currentStep={currentStep}
             onNodesChange={handleNodesChange}
+            onEdgeWeightChange={handleEdgeWeightChange}
           />
         </div>
         {/* Bottom Section - Results and Time Complexity */}

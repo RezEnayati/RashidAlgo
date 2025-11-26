@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import ReactFlow, {
   Node,
   Edge,
@@ -9,6 +9,7 @@ import ReactFlow, {
   useNodesState,
   useEdgesState,
   NodeChange,
+  EdgeMouseHandler,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 
@@ -20,6 +21,7 @@ interface GraphEditorProps {
   sourceNode: string | null;
   currentStep: AlgorithmStep | null;
   onNodesChange: (nodes: GraphNode[]) => void;
+  onEdgeWeightChange?: (edgeId: string, newWeight: number) => void;
 }
 
 export default function GraphEditor({
@@ -28,8 +30,11 @@ export default function GraphEditor({
   sourceNode,
   currentStep,
   onNodesChange,
+  onEdgeWeightChange,
 }: GraphEditorProps) {
   const isDragging = useRef(false);
+  const [editingEdge, setEditingEdge] = useState<{ id: string; weight: string; x: number; y: number } | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   // Convert nodes to React Flow format
   const convertedNodes: Node[] = React.useMemo(() => {
@@ -84,11 +89,60 @@ export default function GraphEditor({
         label: String(edge.weight),
         animated: isRelaxed,
         style: { stroke: isRelaxed ? '#f59e0b' : '#888', strokeWidth: 2 },
-        labelStyle: { fontWeight: 700, fontSize: 14 },
-        labelBgStyle: { fill: '#fff', fillOpacity: 0.8 },
+        labelStyle: { fontWeight: 700, fontSize: 14, cursor: onEdgeWeightChange ? 'pointer' : 'default' },
+        labelBgStyle: { fill: '#fff', fillOpacity: 0.8, cursor: onEdgeWeightChange ? 'pointer' : 'default' },
       };
     });
-  }, [edges, currentStep]);
+  }, [edges, currentStep, onEdgeWeightChange]);
+
+  // Handle edge click to edit weight
+  const handleEdgeClick: EdgeMouseHandler = React.useCallback(
+    (event, edge) => {
+      if (!onEdgeWeightChange) return;
+
+      const graphEdge = edges.find((e) => e.id === edge.id);
+      if (!graphEdge) return;
+
+      // Get click position for the popup
+      const rect = (event.target as HTMLElement).closest('.react-flow')?.getBoundingClientRect();
+      const x = event.clientX - (rect?.left || 0);
+      const y = event.clientY - (rect?.top || 0);
+
+      setEditingEdge({
+        id: edge.id,
+        weight: String(graphEdge.weight),
+        x,
+        y,
+      });
+
+      // Focus input after render
+      setTimeout(() => inputRef.current?.focus(), 0);
+    },
+    [edges, onEdgeWeightChange]
+  );
+
+  // Handle weight update
+  const handleWeightSubmit = React.useCallback(() => {
+    if (!editingEdge || !onEdgeWeightChange) return;
+
+    const newWeight = parseFloat(editingEdge.weight);
+    if (!isNaN(newWeight)) {
+      onEdgeWeightChange(editingEdge.id, newWeight);
+    }
+    setEditingEdge(null);
+  }, [editingEdge, onEdgeWeightChange]);
+
+  // Handle key press in input
+  const handleKeyDown = React.useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === 'Enter') {
+        handleWeightSubmit();
+      } else if (e.key === 'Escape') {
+        setEditingEdge(null);
+      }
+    },
+    [handleWeightSubmit]
+  );
 
   const [rfNodes, setRfNodes, onRfNodesChange] = useNodesState(convertedNodes);
   const [rfEdges, setRfEdges] = useEdgesState(convertedEdges);
@@ -137,11 +191,12 @@ export default function GraphEditor({
   );
 
   return (
-    <div style={{ width: '100%', height: '100%' }} className="bg-slate-900">
+    <div style={{ width: '100%', height: '100%' }} className="bg-slate-900 relative">
       <ReactFlow
         nodes={rfNodes}
         edges={rfEdges}
         onNodesChange={handleNodesChangeInternal}
+        onEdgeClick={handleEdgeClick}
         fitView
       >
         <Controls
@@ -150,6 +205,33 @@ export default function GraphEditor({
         />
         <Background color="#334155" gap={20} />
       </ReactFlow>
+
+      {/* Edge weight edit popup */}
+      {editingEdge && (
+        <div
+          className="absolute z-50"
+          style={{ left: editingEdge.x - 60, top: editingEdge.y - 20 }}
+        >
+          <div className="bg-slate-800 border border-slate-600 rounded-lg shadow-xl p-2 flex gap-2">
+            <input
+              ref={inputRef}
+              type="number"
+              step="0.1"
+              value={editingEdge.weight}
+              onChange={(e) => setEditingEdge({ ...editingEdge, weight: e.target.value })}
+              onKeyDown={handleKeyDown}
+              onBlur={handleWeightSubmit}
+              className="w-20 px-2 py-1 text-sm bg-slate-700 border border-slate-600 rounded text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <button
+              onClick={handleWeightSubmit}
+              className="px-2 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
+            >
+              Save
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

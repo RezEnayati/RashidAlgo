@@ -12,6 +12,16 @@ const algorithms = [
     },
   },
   {
+    id: 'bellman-ford',
+    name: 'Bellman-Ford Algorithm',
+    category: 'Graph',
+    description: 'Find shortest paths from a source node. Handles negative weights and detects negative cycles.',
+    complexity: {
+      time: 'O(V * E)',
+      space: 'O(V)',
+    },
+  },
+  {
     id: 'binary-search',
     name: 'Binary Search',
     category: 'Searching',
