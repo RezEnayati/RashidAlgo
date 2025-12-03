@@ -35,10 +35,6 @@ An interactive algorithm visualization platform built with Next.js. Learn algori
 ### Installation
 
 ```bash
-# Clone the repository
-git clone https://github.com/yourusername/rashidalgo.git
-cd rashidalgo
-
 # Install dependencies
 npm install
 
