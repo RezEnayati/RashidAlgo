@@ -49,6 +49,12 @@ export default function BellmanFordVisualizerPage() {
   const [error, setError] = useState<string | null>(null);
   const [hasNegativeCycle, setHasNegativeCycle] = useState<boolean>(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const stepsRef = useRef<BellmanFordStep[]>([]);
+
+  // Keep stepsRef in sync with steps
+  useEffect(() => {
+    stepsRef.current = steps;
+  }, [steps]);
 
   // Form state
   const [nodeLabel, setNodeLabel] = useState('');
@@ -68,7 +74,8 @@ export default function BellmanFordVisualizerPage() {
     if (isPlaying && isRunning) {
       intervalRef.current = setInterval(() => {
         setCurrentStepIndex((prev) => {
-          if (prev >= steps.length - 1) {
+          const currentStepsLength = stepsRef.current.length;
+          if (prev >= currentStepsLength - 1) {
             setIsPlaying(false);
             return prev;
           }
@@ -80,9 +87,10 @@ export default function BellmanFordVisualizerPage() {
     return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
+        intervalRef.current = null;
       }
     };
-  }, [isPlaying, isRunning, speed, steps.length]);
+  }, [isPlaying, isRunning, speed]);
 
   const handleNodesChange = useCallback((newNodes: GraphNode[]) => {
     setNodes(newNodes);

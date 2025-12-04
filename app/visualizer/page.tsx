@@ -1,9 +1,11 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 
-const algorithms = [
+const ENABLE_BELLMAN_FORD = process.env.NEXT_PUBLIC_ENABLE_BELLMAN_FORD === 'true';
+
+const allAlgorithms = [
   {
     id: 'dijkstra',
     name: "Dijkstra's Algorithm",
@@ -58,6 +60,15 @@ const algorithms = [
 
 export default function VisualizerPage() {
   const [search, setSearch] = useState('');
+
+  const algorithms = useMemo(() => {
+    return allAlgorithms.filter((algo) => {
+      if (algo.id === 'bellman-ford' && !ENABLE_BELLMAN_FORD) {
+        return false;
+      }
+      return true;
+    });
+  }, []);
 
   const filteredAlgorithms = algorithms.filter((algo) => {
     const searchLower = search.toLowerCase();

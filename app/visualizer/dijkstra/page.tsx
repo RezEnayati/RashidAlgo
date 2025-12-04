@@ -39,6 +39,12 @@ export default function DijkstraVisualizerPage() {
   const [speed, setSpeed] = useState<number>(500);
   const [error, setError] = useState<string | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const stepsRef = useRef<AlgorithmStep[]>([]);
+
+  // Keep stepsRef in sync with steps
+  useEffect(() => {
+    stepsRef.current = steps;
+  }, [steps]);
 
   const currentStep = currentStepIndex >= 0 && currentStepIndex < steps.length
     ? steps[currentStepIndex]
@@ -49,7 +55,8 @@ export default function DijkstraVisualizerPage() {
     if (isPlaying && isRunning) {
       intervalRef.current = setInterval(() => {
         setCurrentStepIndex((prev) => {
-          if (prev >= steps.length - 1) {
+          const currentStepsLength = stepsRef.current.length;
+          if (prev >= currentStepsLength - 1) {
             setIsPlaying(false);
             return prev;
           }
@@ -61,9 +68,10 @@ export default function DijkstraVisualizerPage() {
     return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
+        intervalRef.current = null;
       }
     };
-  }, [isPlaying, isRunning, speed, steps.length]);
+  }, [isPlaying, isRunning, speed]);
 
   const handleNodesChange = useCallback((newNodes: GraphNode[]) => {
     setNodes(newNodes);
