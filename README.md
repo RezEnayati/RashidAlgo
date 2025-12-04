@@ -16,6 +16,7 @@ An interactive algorithm visualization platform built with Next.js. Learn algori
 | Bellman-Ford | Graph | O(V * E) |
 | Binary Search | Searching | O(log n) |
 | QuickSort | Sorting | O(n log n) |
+| Bubble Sort | Sorting | O(n²) |
 
 ## Tech Stack
 
@@ -58,7 +59,8 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 │   │   ├── dijkstra/
 │   │   ├── bellman-ford/
 │   │   ├── binary-search/
-│   │   └── quicksort/
+│   │   ├── quicksort/
+│   │   └── bubblesort/
 │   └── page.tsx         # Homepage
 ├── components/          # React components
 ├── lib/                 # Algorithm implementations
